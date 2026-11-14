@@ -63,6 +63,25 @@ describe('cart page', () => {
     expect(screen.getByRole('button', { name: 'Checkout unavailable' })).toBeDisabled();
   });
 
+  it('changes the quantity with the plus and minus buttons', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(screen.getAllByRole('button', { name: 'Add to cart' })[1]);
+    await user.click(screen.getByRole('link', { name: /Cart/ }));
+    const line = screen.getByTestId('cart-line');
+    const quantity = within(line).getByLabelText('Quantity of Ceramic Coffee Mug');
+    const unitPrice = within(line).getAllByRole('cell')[0];
+
+    await user.click(within(line).getByRole('button', { name: 'Increase quantity of Ceramic Coffee Mug' }));
+    expect(quantity).toHaveTextContent('2');
+    expect(screen.getByTestId('cart-count')).toHaveTextContent('2');
+    expect(unitPrice).toHaveTextContent('180 EGP');
+
+    await user.click(within(line).getByRole('button', { name: 'Decrease quantity of Ceramic Coffee Mug' }));
+    expect(quantity).toHaveTextContent('1');
+    expect(unitPrice).toHaveTextContent('180 EGP');
+  });
+
   it('removes a product from the cart', async () => {
     const user = userEvent.setup();
     renderApp();
